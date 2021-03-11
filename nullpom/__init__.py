@@ -1,1 +1,1 @@
-__version__ = '0.1.0'
+from .main import run_null_importance

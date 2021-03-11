@@ -5,7 +5,11 @@ description = "test"
 authors = ["tenajima <tenajima@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.7.1"
+scikit-learn = "^0.24.1"
+pandas = "^1.2.3"
+black = "^20.8b1"
+lightgbm = "^3.1.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
