@@ -41,11 +41,15 @@ class Experiment:
             y_valid = np.random.permutation(self.y_valid)
             dtrain = lgb.Dataset(self.X_train, y_train)
             dvalid = lgb.Dataset(self.X_valid, y_valid)
+            verbose_eval = False
         else:
             dtrain = lgb.Dataset(self.X_train, self.y_train)
             dvalid = lgb.Dataset(self.X_valid, self.y_valid)
+            verbose_eval = 1000
 
-        model = lgb.train(self.params, dtrain, valid_sets=[dtrain, dvalid])
+        model = lgb.train(
+            self.params, dtrain, valid_sets=[dtrain, dvalid], verbose_eval=verbose_eval
+        )
 
         importance = pd.DataFrame()
         importance["feature"] = model.feature_name()
