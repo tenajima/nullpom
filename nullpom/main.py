@@ -50,7 +50,9 @@ class Experiment:
         importance = pd.DataFrame()
         importance["feature"] = model.feature_name()
         importance["importance"] = model.feature_importance("gain")
-        importance = importance.sort_values("importance", ascending=False).reset_index()
+        importance = importance.sort_values("importance", ascending=False).reset_index(
+            drop=True
+        )
         return importance, model
 
     def execute(self):
