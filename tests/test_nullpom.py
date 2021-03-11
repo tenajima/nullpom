@@ -20,7 +20,7 @@ TMP_RESULT_DIR = "./tmp"
 @pytest.fixture
 def result():
     result = run_null_importance(
-        {"objective": "binary"},
+        {"objective": "binary", "seed": 42},
         output_dir=TMP_RESULT_DIR,
         X_train=X_train,
         X_valid=X_valid,

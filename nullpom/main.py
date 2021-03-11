@@ -1,8 +1,10 @@
 import pickle
+import math
 import os
 from datetime import datetime
 
 import lightgbm as lgb
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -22,6 +24,7 @@ def run_null_importance(
     if output_dir == "":
         output_dir = datetime.now().strftime(r"%Y%m%d_%H%M%S")
     result.save(output_dir)
+    return result
 
 
 class NullImportanceResult:
@@ -41,6 +44,9 @@ class NullImportanceResult:
         )
         self.null_importance.to_pickle(os.path.join(output_dir, "null_importance.pkl"))
 
+        fig = self.plot_importance()
+        fig.savefig(os.path.join(output_dir, "distribution_of_importance.png"))
+
     @classmethod
     def load(cls, input_dir):
         actual_model = pd.read_pickle(os.path.join(input_dir, "actual_model.pkl"))
@@ -49,6 +55,34 @@ class NullImportanceResult:
         )
         null_importance = pd.read_pickle(os.path.join(input_dir, "null_importance.pkl"))
         return cls(actual_importance, actual_model, null_importance)
+
+    def plot_importance(self):
+        features = self.actual_importance["feature"].unique().tolist()
+        num_features = len(features)
+        AX_COUNT_PER_ROW = 4
+        col_width = AX_COUNT_PER_ROW * 8
+        row_width = np.maximum(1, (num_features // AX_COUNT_PER_ROW)) * 4
+        fig = plt.figure(figsize=(col_width, row_width))
+        num_of_rows = math.ceil(num_features / AX_COUNT_PER_ROW)
+        for i, feature in enumerate(features):
+            ax = fig.add_subplot(num_of_rows, AX_COUNT_PER_ROW, i + 1)
+            hist_info = ax.hist(
+                self.null_importance.query(f"feature == '{feature}'")["importance"],
+                label="Null importance",
+            )
+            ax.vlines(
+                x=self.actual_importance.loc[i, "importance"],
+                ymin=0,
+                ymax=np.max(hist_info[0]),
+                color="r",
+                linewidth=5,
+                label="Real Target",
+            )
+            ax.legend(loc="upper right")
+            ax.set_title(f"Importance of {feature.upper()}", fontweight="bold")
+            ax.set_xlabel(f"Null Importance Distribution for {feature.upper()}")
+            ax.set_ylabel("Importance")
+        return fig
 
 
 class Experiment:
