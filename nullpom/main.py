@@ -1,25 +1,54 @@
+import pickle
+import os
+from datetime import datetime
+
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
 
 
-def run_null_importance(params, n_runs=100, *, X_train, X_valid, y_train, y_valid):
+def run_null_importance(
+    params, output_dir="", n_runs=100, *, X_train, X_valid, y_train, y_valid
+):
     experiment = Experiment(
         params,
-        n_runs=100,
+        n_runs=n_runs,
         X_train=X_train,
         X_valid=X_valid,
         y_train=y_train,
         y_valid=y_valid,
     )
-    return experiment.execute()
+    result = experiment.execute()
+    if output_dir == "":
+        output_dir = datetime.now().strftime(r"%Y%m%d_%H%M%S")
+    result.save(output_dir)
 
 
-class Result:
+class NullImportanceResult:
     def __init__(self, actual_importance, actual_model, null_importance):
         self.actual_importance = actual_importance
         self.actual_model = actual_model
         self.null_importance = null_importance
+
+    def save(self, output_dir):
+        output_dir = os.path.join("./", output_dir)
+        os.makedirs(output_dir)
+        with open(os.path.join(output_dir, "actual_model.pkl"), "wb") as f:
+            pickle.dump(self.actual_model, f)
+
+        self.actual_importance.to_pickle(
+            os.path.join(output_dir, "actual_importance.pkl")
+        )
+        self.null_importance.to_pickle(os.path.join(output_dir, "null_importance.pkl"))
+
+    @classmethod
+    def load(cls, input_dir):
+        actual_model = pd.read_pickle(os.path.join(input_dir, "actual_model.pkl"))
+        actual_importance = pd.read_pickle(
+            os.path.join(input_dir, "actual_importance.pkl")
+        )
+        null_importance = pd.read_pickle(os.path.join(input_dir, "null_importance.pkl"))
+        return cls(actual_importance, actual_model, null_importance)
 
 
 class Experiment:
@@ -70,4 +99,4 @@ class Experiment:
             tmp_importance, _ = self.get_feature_importance(shuffle=True)
             null_importance = pd.concat([null_importance, tmp_importance])
 
-        return Result(actual_importance, actual_model, null_importance)
+        return NullImportanceResult(actual_importance, actual_model, null_importance)
