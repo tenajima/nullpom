@@ -1,1 +1,1 @@
-from .main import run_null_importance
+from .main import run_null_importance  # NOQA
