@@ -59,6 +59,8 @@ def test_run_null_importance(result):
     assert os.path.exists(os.path.join(TMP_RESULT_DIR, "actual_importance.pkl"))
     assert os.path.exists(os.path.join(TMP_RESULT_DIR, "null_importance.pkl"))
 
+    assert result.get_effective_feature()
+
     result_loaded = NullImportanceResult.load(TMP_RESULT_DIR)
     assert hasattr(result_loaded, "actual_model")
     assert hasattr(result_loaded, "actual_importance")
