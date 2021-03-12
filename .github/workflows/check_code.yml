@@ -7,32 +7,24 @@ on:
 jobs:
   pytest:
     name: Run tests with pytest
-    # 実行環境として `ubuntu-latest` という名前のものを選ぶ
     runs-on: ubuntu-latest
-    # 複数の Python のバージョンでテストするために `strategy.matrix` を設定する
     strategy:
       matrix:
         python-version: [3.7, 3.8]
     steps:
-      # リポジトリをチェックアウトする
-      # See: https://github.com/actions/checkout
       - name: Checkout
         uses: actions/checkout@v2
-      # Python のランタイムをセットアップする
-      # バージョンは `strategy.matrix` に並べたものを指定する
-      # See: https://github.com/actions/setup-python
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-      # Poetry そのものをインストールする
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install poetry
-      # インストールした Poetry を使って必要な Python パッケージをインストールする
       - name: Install Dependencies
         run: poetry install --no-interaction
-      # pytest を実行する
       - name: Run Tests
         run: poetry run pytest tests/
+      - name: Check code style with Black
+        run: poetry run black --check --diff .
