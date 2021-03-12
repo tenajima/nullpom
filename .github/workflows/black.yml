@@ -1,0 +1,27 @@
+name: Format with black
+
+on:
+  push:
+    paths-ignore:
+      - ".gitignore"
+      - "README.md"
+  pull_request:
+
+jobs:
+  black:
+    name: Format with black
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black
+      - name: Check code style with Black
+        run: black --check --diff .
