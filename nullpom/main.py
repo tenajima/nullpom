@@ -1,6 +1,6 @@
-import pickle
 import math
 import os
+import pickle
 from datetime import datetime
 
 import lightgbm as lgb
@@ -63,6 +63,7 @@ class NullImportanceResult:
         col_width = AX_COUNT_PER_ROW * 8
         row_width = np.maximum(1, (num_features // AX_COUNT_PER_ROW)) * 4
         fig = plt.figure(figsize=(col_width, row_width))
+        fig.subplots_adjust(hspace=0.6)
         num_of_rows = math.ceil(num_features / AX_COUNT_PER_ROW)
         for i, feature in enumerate(features):
             ax = fig.add_subplot(num_of_rows, AX_COUNT_PER_ROW, i + 1)
@@ -83,6 +84,19 @@ class NullImportanceResult:
             ax.set_xlabel(f"Null Importance Distribution for {feature.upper()}")
             ax.set_ylabel("Importance")
         return fig
+
+    def get_effective_feature(self, threshold=90):
+        feature_threshold = (
+            self.null_importance.groupby("feature")["importance"]
+            .apply(lambda x: np.percentile(x, threshold))
+            .to_dict()
+        )
+        importance = self.actual_importance.copy()
+        importance["threshold"] = importance["feature"].map(feature_threshold)
+        effective_feature = importance.loc[
+            importance["importance"] > importance["threshold"], "feature"
+        ].tolist()
+        return effective_feature
 
 
 class Experiment:
