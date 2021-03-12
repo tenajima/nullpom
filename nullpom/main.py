@@ -63,6 +63,7 @@ class NullImportanceResult:
         col_width = AX_COUNT_PER_ROW * 8
         row_width = np.maximum(1, (num_features // AX_COUNT_PER_ROW)) * 4
         fig = plt.figure(figsize=(col_width, row_width))
+        fig.subplots_adjust(hspace=0.6)
         num_of_rows = math.ceil(num_features / AX_COUNT_PER_ROW)
         for i, feature in enumerate(features):
             ax = fig.add_subplot(num_of_rows, AX_COUNT_PER_ROW, i + 1)
