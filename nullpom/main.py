@@ -1,6 +1,6 @@
-import pickle
 import math
 import os
+import pickle
 from datetime import datetime
 
 import lightgbm as lgb
@@ -83,6 +83,19 @@ class NullImportanceResult:
             ax.set_xlabel(f"Null Importance Distribution for {feature.upper()}")
             ax.set_ylabel("Importance")
         return fig
+
+    def get_effective_feature(self, threshold=90):
+        feature_threshold = (
+            self.null_importance.groupby("feature")["importance"]
+            .apply(lambda x: np.percentile(x, threshold))
+            .to_dict()
+        )
+        importance = self.actual_importance.copy()
+        importance["threshold"] = importance["feature"].map(feature_threshold)
+        effective_feature = importance.loc[
+            importance["importance"] > importance["threshold"], "feature"
+        ].tolist()
+        return effective_feature
 
 
 class Experiment:
