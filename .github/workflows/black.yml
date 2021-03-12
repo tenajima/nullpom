@@ -2,6 +2,9 @@ name: Format with black
 
 on:
   push:
+    paths-ignore:
+      - ".gitignore"
+      - "README.md"
   pull_request:
 
 jobs:
