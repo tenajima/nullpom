@@ -2,7 +2,7 @@ import math
 import os
 import pickle
 from datetime import datetime
-from typing import Dict, Tuple, Union
+from typing import Dict, Optional, Tuple, Union
 
 import lightgbm as lgb
 import matplotlib.pyplot as plt
@@ -22,8 +22,8 @@ class NullImportanceResult:
         self.actual_model = actual_model
         self.null_importance = null_importance
 
-    def save(self, output_dir: str) -> None:
-        output_dir = os.path.join("./", output_dir)
+    def save(self, output_dir: str, fig=Optional[Figure]) -> None:
+        # output_dir = os.path.join("./", output_dir)
         os.makedirs(output_dir)
         with open(os.path.join(output_dir, "actual_model.pkl"), "wb") as f:
             pickle.dump(self.actual_model, f)
@@ -33,8 +33,8 @@ class NullImportanceResult:
         )
         self.null_importance.to_pickle(os.path.join(output_dir, "null_importance.pkl"))
 
-        fig = self.plot_importance()
-        fig.savefig(os.path.join(output_dir, "distribution_of_importance.png"))
+        if fig is not None:
+            fig.savefig(os.path.join(output_dir, "distribution_of_importance.png"))
 
     @classmethod
     def load(cls, input_dir: str):
@@ -143,8 +143,9 @@ class Experiment:
 
 def run_null_importance(
     params: Dict,
-    output_dir: str = "",
+    output_dir: str = "output/{time}",
     n_runs: int = 100,
+    plot_importance: bool = True,
     *,
     X_train: pd.DataFrame,
     X_valid: pd.DataFrame,
@@ -160,7 +161,10 @@ def run_null_importance(
         y_valid=y_valid,
     )
     result = experiment.execute()
-    if output_dir == "":
-        output_dir = datetime.now().strftime(r"%Y%m%d_%H%M%S")
-    result.save(output_dir)
+    output_dir = output_dir.format(time=datetime.now().strftime(r"%Y%m%d_%H%M%S"))
+    if plot_importance:
+        fig = result.plot_importance()
+    else:
+        fig = None
+    result.save(output_dir, fig)
     return result
