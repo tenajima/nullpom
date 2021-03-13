@@ -5,6 +5,7 @@ on:
     paths-ignore:
       - ".gitignore"
       - "README.md"
+      - "img/**"
   pull_request:
 
 jobs:
