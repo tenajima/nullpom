@@ -1,8 +1,14 @@
 [tool.poetry]
 name = "nullpom"
 version = "0.0.0"
-description = "test"
+description = "Library to easily run Null Importances."
 authors = ["tenajima <tenajima@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = ""
+repository = "https://github.com/tenajima/nullpom"
+documentation = "https://github.com/tenajima/nullpom"
+keywords = ["null importance", "feature selection", "importance", "kaggle"]
 
 [tool.poetry.dependencies]
 python = "^3.7.1"
