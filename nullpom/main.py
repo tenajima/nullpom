@@ -1,6 +1,8 @@
 import math
 import os
 import pickle
+import shutil
+import warnings
 from datetime import datetime
 from typing import Dict, Optional, Tuple, Union
 
@@ -23,8 +25,6 @@ class NullImportanceResult:
         self.null_importance = null_importance
 
     def save(self, output_dir: str, fig=Optional[Figure]) -> None:
-        # output_dir = os.path.join("./", output_dir)
-        os.makedirs(output_dir)
         with open(os.path.join(output_dir, "actual_model.pkl"), "wb") as f:
             pickle.dump(self.actual_model, f)
 
@@ -146,6 +146,7 @@ def run_null_importance(
     output_dir: str = "output/{time}",
     n_runs: int = 100,
     plot_importance: bool = True,
+    if_exists: str = "error",
     *,
     X_train: pd.DataFrame,
     X_valid: pd.DataFrame,
@@ -160,8 +161,26 @@ def run_null_importance(
         y_train=y_train,
         y_valid=y_valid,
     )
-    result = experiment.execute()
     output_dir = output_dir.format(time=datetime.now().strftime(r"%Y%m%d_%H%M%S"))
+
+    # Check output_dir
+    if os.path.exists(output_dir):
+        if if_exists == "error":
+            raise ValueError("directory {} already exists.".format(output_dir))
+        elif if_exists == "replace":
+            warnings.warn(
+                "directory {} already exists. \
+                    It will be replaced by the new result".format(
+                    output_dir
+                )
+            )
+            shutil.rmtree(output_dir, ignore_errors=True)
+        else:
+            raise ValueError("`if_exists` must be `error` or `replace`.")
+
+    os.makedirs(output_dir)
+
+    result = experiment.execute()
     if plot_importance:
         fig = result.plot_importance()
     else:
