@@ -1,5 +1,8 @@
 [![Test with pytest](https://github.com/tenajima/nullpom/actions/workflows/pytest.yml/badge.svg)](https://github.com/tenajima/nullpom/actions/workflows/pytest.yml)
 [![Format with black](https://github.com/tenajima/nullpom/actions/workflows/black.yml/badge.svg)](https://github.com/tenajima/nullpom/actions/workflows/black.yml)
+[![Downloads](https://pepy.tech/badge/nullpom)](https://pepy.tech/project/nullpom)
+[![Downloads](https://pepy.tech/badge/nullpom/week)](https://pepy.tech/project/nullpom)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 # nullpom
 
